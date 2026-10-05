@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard | TaskFlow</title>
+  <meta name="description" content="Manage your tasks, track your progress and stay focused with TaskFlow.">
+  <meta name="theme-color" content="#0f766e">
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+  <script>
+    /* Apply the saved theme before first paint to avoid a flash. */
+    (function () {
+      try {
+        var stored = JSON.parse(localStorage.getItem('taskflow.theme'));
+        var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.dataset.theme = stored === 'light' || stored === 'dark' ? stored : dark ? 'dark' : 'light';
+      } catch (error) {
+        document.documentElement.dataset.theme = 'light';
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body data-page="dashboard">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <noscript><p class="noscript">TaskFlow needs JavaScript to run. Please enable it in your browser.</p></noscript>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Sidebar">
+      <div class="sidebar__head">
+        <a class="logo" href="index.html" aria-label="TaskFlow home page">
+          <svg class="logo__mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+            <rect width="32" height="32" rx="9"></rect>
+            <path d="M9 16.5l4.5 4.5L23 11" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+          <span class="logo__text">TaskFlow</span>
+        </a>
+        <button class="icon-btn sidebar__close" id="sidebarClose" type="button" aria-label="Close menu" data-icon="x"></button>
+      </div>
+
+      <nav class="sidebar__nav" aria-label="Main">
+        <ul class="nav-list">
+          <li><a class="nav-link" href="#dashboard" data-route="dashboard"><span class="nav-link__icon" data-icon="layout"></span>Dashboard</a></li>
+          <li><a class="nav-link" href="#tasks" data-route="tasks"><span class="nav-link__icon" data-icon="list"></span>My Tasks</a></li>
+          <li><a class="nav-link" href="#tasks/today" data-route="today"><span class="nav-link__icon" data-icon="clock"></span>Today</a></li>
+          <li><a class="nav-link" href="#tasks/upcoming" data-route="upcoming"><span class="nav-link__icon" data-icon="calendar"></span>Upcoming</a></li>
+          <li><a class="nav-link" href="#tasks/completed" data-route="completed"><span class="nav-link__icon" data-icon="check-circle"></span>Completed</a></li>
+          <li><a class="nav-link" href="#categories" data-route="categories"><span class="nav-link__icon" data-icon="tag"></span>Categories</a></li>
+          <li><a class="nav-link" href="#settings" data-route="settings"><span class="nav-link__icon" data-icon="sliders"></span>Settings</a></li>
+        </ul>
+      </nav>
+
+      <div class="sidebar__footer">
+        <a class="profile" href="#settings" title="Account settings">
+          <span class="avatar" data-user-avatar aria-hidden="true"></span>
+          <span class="profile__text">
+            <span class="profile__name" data-user-name></span>
+            <span class="profile__email" data-user-email></span>
+          </span>
+        </a>
+        <a class="nav-link nav-link--logout" href="index.html"><span class="nav-link__icon" data-icon="log-out"></span>Logout</a>
+      </div>
+    </aside>
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop" hidden></div>
+
+    <div class="main-area">
+      <header class="topbar">
+        <button class="icon-btn topbar__menu" id="menuToggle" type="button" aria-label="Open menu" aria-controls="sidebar" aria-expanded="false" data-icon="menu"></button>
+        <h1 class="topbar__title" id="pageTitle">Dashboard</h1>
+
+        <form class="search" id="searchForm" role="search">
+          <span class="search__icon" data-icon="search"></span>
+          <label class="visually-hidden" for="searchInput">Search tasks</label>
+          <input class="search__input" id="searchInput" type="search" placeholder="Search tasks" autocomplete="off">
+        </form>
+
+        <button class="btn btn-primary topbar__add" type="button" data-action="create-task" aria-label="Add Task">
+          <span data-icon="plus"></span>
+          <span>Add Task</span>
+        </button>
+
+        <div class="topbar__tools">
+          <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch to dark mode">
+            <span class="theme-icon theme-icon--moon" data-icon="moon"></span>
+            <span class="theme-icon theme-icon--sun" data-icon="sun"></span>
+          </button>
+
+          <div class="notif">
+            <button class="icon-btn notif__button" id="notifButton" type="button" aria-label="Notifications" aria-haspopup="true" aria-expanded="false" aria-controls="notifPanel">
+              <span data-icon="bell"></span>
+              <span class="notif__badge" id="notifBadge" hidden>0</span>
+            </button>
+            <div class="notif__panel" id="notifPanel" role="region" aria-label="Notifications" hidden>
+              <div class="notif__head">
+                <h2 class="notif__title">Notifications</h2>
+                <div class="notif__tools">
+                  <button class="btn btn-ghost btn-sm" id="notifMarkAll" type="button">Mark all as read</button>
+                  <button class="btn btn-ghost btn-sm" id="notifClear" type="button">Clear all</button>
+                </div>
+              </div>
+              <p class="notif__off" id="notifOffNote" hidden>Notifications are turned off in Settings. New alerts won’t appear.</p>
+              <ul class="notif__list" id="notifList"></ul>
+            </div>
+          </div>
+
+          <a class="avatar-link" href="#settings" aria-label="Open account settings">
+            <span class="avatar" data-user-avatar aria-hidden="true"></span>
+          </a>
+        </div>
+      </header>
+
+      <main class="page" id="main" tabindex="-1">
+
+        <!-- Dashboard overview -->
+        <section class="view" id="view-dashboard" data-view="dashboard" aria-labelledby="welcomeTitle">
+          <div class="welcome">
+            <h2 class="welcome__title" id="welcomeTitle">Welcome back!</h2>
+            <p class="welcome__sub" id="welcomeSub"></p>
+          </div>
+
+          <div class="stats">
+            <article class="stat">
+              <span class="stat__icon stat__icon--total" data-icon="list"></span>
+              <div class="stat__body">
+                <p class="stat__label">Total Tasks</p>
+                <p class="stat__value" data-stat="total">0</p>
+                <p class="stat__note" data-stat-note="total"></p>
+              </div>
+            </article>
+            <article class="stat">
+              <span class="stat__icon stat__icon--completed" data-icon="check-circle"></span>
+              <div class="stat__body">
+                <p class="stat__label">Completed</p>
+                <p class="stat__value" data-stat="completed">0</p>
+                <p class="stat__note" data-stat-note="completed"></p>
+              </div>
+            </article>
+            <article class="stat">
+              <span class="stat__icon stat__icon--progress" data-icon="loader"></span>
+              <div class="stat__body">
+                <p class="stat__label">In Progress</p>
+                <p class="stat__value" data-stat="inProgress">0</p>
+                <p class="stat__note" data-stat-note="inProgress"></p>
+              </div>
+            </article>
+            <article class="stat">
+              <span class="stat__icon stat__icon--overdue" data-icon="alert"></span>
+              <div class="stat__body">
+                <p class="stat__label">Overdue</p>
+                <p class="stat__value" data-stat="overdue">0</p>
+                <p class="stat__note" data-stat-note="overdue"></p>
+              </div>
+            </article>
+          </div>
+
+          <section class="card progress-card" aria-labelledby="progressTitle">
+            <div class="progress-card__summary">
+              <h2 class="card__title" id="progressTitle">Today’s Progress</h2>
+              <p class="progress-card__detail" id="progressDetail"></p>
+            </div>
+            <p class="progress-card__percent" id="progressPercent">0%</p>
+            <div class="progress" id="progressBar" role="progressbar" aria-labelledby="progressTitle" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <div class="progress__fill" id="progressFill"></div>
+            </div>
+          </section>
+
+          <div class="dashboard-grid">
+            <section class="card" aria-labelledby="recentTitle">
+              <header class="card__header">
+                <h2 class="card__title" id="recentTitle">Recent Tasks</h2>
+                <a class="link" href="#tasks/all">View all</a>
+              </header>
+              <div class="task-list" id="recentTasks"></div>
+            </section>
+
+            <section class="card" aria-labelledby="upcomingTitle">
+              <header class="card__header">
+                <h2 class="card__title" id="upcomingTitle">Upcoming Tasks</h2>
+                <a class="link" href="#tasks/upcoming">View all</a>
+              </header>
+              <div class="task-list task-list--compact" id="upcomingTasks"></div>
+            </section>
+          </div>
+        </section>
+
+        <!-- Task list (My Tasks, Today, Upcoming, Completed) -->
+        <section class="view" id="view-tasks" data-view="tasks" aria-labelledby="pageTitle" hidden>
+          <div class="toolbar">
+            <div class="filter-group" id="filterGroup" role="group" aria-label="Filter tasks">
+              <button class="chip" type="button" data-filter="all" aria-pressed="true">All <span class="chip__count">0</span></button>
+              <button class="chip" type="button" data-filter="today" aria-pressed="false">Today <span class="chip__count">0</span></button>
+              <button class="chip" type="button" data-filter="upcoming" aria-pressed="false">Upcoming <span class="chip__count">0</span></button>
+              <button class="chip" type="button" data-filter="completed" aria-pressed="false">Completed <span class="chip__count">0</span></button>
+              <button class="chip" type="button" data-filter="in-progress" aria-pressed="false">In Progress <span class="chip__count">0</span></button>
+              <button class="chip" type="button" data-filter="overdue" aria-pressed="false">Overdue <span class="chip__count">0</span></button>
+            </div>
+            <div class="toolbar__sort">
+              <label for="sortSelect">Sort by</label>
+              <select class="select select--compact" id="sortSelect">
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+                <option value="priority">Priority</option>
+                <option value="dueDate">Due Date</option>
+                <option value="alphabetical">Alphabetical</option>
+              </select>
+            </div>
+          </div>
+          <div class="active-filters" id="activeFilters" hidden></div>
+          <p class="result-count" id="resultCount" aria-live="polite"></p>
+          <div class="task-list" id="taskList"></div>
+        </section>
+
+        <!-- Categories -->
+        <section class="view" id="view-categories" data-view="categories" aria-labelledby="pageTitle" hidden>
+          <form class="card category-form" id="categoryForm" novalidate>
+            <h2 class="card__title">Add a category</h2>
+            <div class="category-form__row">
+              <div class="field">
+                <label class="field__label" for="categoryName">Category name</label>
+                <input class="input" id="categoryName" type="text" maxlength="24" autocomplete="off" placeholder="e.g. Fitness" aria-describedby="categoryNameError">
+                <p class="field__error" id="categoryNameError" hidden></p>
+              </div>
+              <fieldset class="field fieldset">
+                <legend class="field__label">Color</legend>
+                <div class="swatches" id="categoryColors"></div>
+              </fieldset>
+              <button class="btn btn-primary" type="submit">Add Category</button>
+            </div>
+          </form>
+          <div class="category-grid" id="categoryGrid"></div>
+        </section>
+
+        <!-- Settings -->
+        <section class="view" id="view-settings" data-view="settings" aria-labelledby="pageTitle" hidden>
+          <div class="settings">
+            <section class="card settings__card" aria-labelledby="appearanceTitle">
+              <h2 class="card__title" id="appearanceTitle">Appearance</h2>
+              <fieldset class="fieldset">
+                <legend class="visually-hidden">Theme</legend>
+                <div class="choice-group">
+                  <label class="choice-card">
+                    <input type="radio" name="theme" value="light">
+                    <span class="choice-card__preview choice-card__preview--light" aria-hidden="true"><span></span><span></span></span>
+                    <span class="choice-card__label">Light Mode</span>
+                  </label>
+                  <label class="choice-card">
+                    <input type="radio" name="theme" value="dark">
+                    <span class="choice-card__preview choice-card__preview--dark" aria-hidden="true"><span></span><span></span></span>
+                    <span class="choice-card__label">Dark Mode</span>
+                  </label>
+                </div>
+              </fieldset>
+            </section>
+
+            <section class="card settings__card" aria-labelledby="preferencesTitle">
+              <h2 class="card__title" id="preferencesTitle">Preferences</h2>
+              <div class="setting-row">
+                <div>
+                  <label class="setting-row__label" for="settingNotifications">Notifications</label>
+                  <p class="setting-row__hint">Get alerts when tasks are created, completed, due soon or overdue.</p>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" role="switch" id="settingNotifications">
+                  <span class="switch__track" aria-hidden="true"></span>
+                </label>
+              </div>
+              <div class="setting-row">
+                <div>
+                  <label class="setting-row__label" for="settingDefaultFilter">Default task view</label>
+                  <p class="setting-row__hint">The filter used when you open My Tasks.</p>
+                </div>
+                <select class="select select--compact" id="settingDefaultFilter">
+                  <option value="all">All</option>
+                  <option value="today">Today</option>
+                  <option value="upcoming">Upcoming</option>
+                  <option value="in-progress">In Progress</option>
+                  <option value="overdue">Overdue</option>
+                </select>
+              </div>
+            </section>
+
+            <section class="card settings__card" aria-labelledby="accountTitle">
+              <h2 class="card__title" id="accountTitle">Account</h2>
+              <form id="profileForm" novalidate>
+                <div class="profile-edit">
+                  <span class="avatar avatar--lg" id="avatarPreview" aria-hidden="true"></span>
+                  <div class="profile-edit__fields">
+                    <div class="field">
+                      <label class="field__label" for="profileName">Name</label>
+                      <input class="input" id="profileName" type="text" maxlength="40" autocomplete="name" aria-describedby="profileNameError">
+                      <p class="field__error" id="profileNameError" hidden></p>
+                    </div>
+                    <div class="field">
+                      <label class="field__label" for="profileEmail">Email</label>
+                      <input class="input" id="profileEmail" type="email" maxlength="80" autocomplete="email" aria-describedby="profileEmailError">
+                      <p class="field__error" id="profileEmailError" hidden></p>
+                    </div>
+                    <fieldset class="field fieldset">
+                      <legend class="field__label">Profile avatar</legend>
+                      <div class="swatches" id="avatarSwatches"></div>
+                    </fieldset>
+                  </div>
+                </div>
+                <div class="settings__actions">
+                  <button class="btn btn-primary" type="submit">Save Profile</button>
+                </div>
+              </form>
+            </section>
+
+            <section class="card settings__card" aria-labelledby="dataTitle">
+              <h2 class="card__title" id="dataTitle">Data</h2>
+              <div class="setting-row">
+                <div>
+                  <p class="setting-row__label">Reset all data</p>
+                  <p class="setting-row__hint">Removes your tasks, categories and settings from this browser and restores the demo tasks.</p>
+                </div>
+                <button class="btn btn-secondary btn-danger-outline" id="resetDataButton" type="button">Reset Data</button>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Task modal (create and edit) -->
+  <div class="modal" id="taskModal" hidden>
+    <div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="taskModalTitle">
+      <header class="modal__header">
+        <h2 class="modal__title" id="taskModalTitle">New Task</h2>
+        <button class="icon-btn" type="button" data-close-modal aria-label="Close dialog" data-icon="x"></button>
+      </header>
+      <form id="taskForm" novalidate>
+        <div class="modal__body">
+          <div class="field">
+            <label class="field__label" for="taskTitle">Task Title</label>
+            <input class="input" id="taskTitle" name="title" type="text" maxlength="120" autocomplete="off" placeholder="e.g. Finish portfolio homepage" aria-describedby="taskTitleError" required data-autofocus>
+            <p class="field__error" id="taskTitleError" hidden></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="taskDescription">Description <span class="field__optional">(optional)</span></label>
+            <textarea class="textarea" id="taskDescription" name="description" rows="3" maxlength="500" placeholder="Add a few details" aria-describedby="taskDescriptionError"></textarea>
+            <p class="field__error" id="taskDescriptionError" hidden></p>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label class="field__label" for="taskCategory">Category</label>
+              <select class="select" id="taskCategory" name="category" aria-describedby="taskCategoryError" required>
+                <option value="">Select a category</option>
+              </select>
+              <p class="field__error" id="taskCategoryError" hidden></p>
+            </div>
+            <div class="field">
+              <label class="field__label" for="taskPriority">Priority</label>
+              <select class="select" id="taskPriority" name="priority" aria-describedby="taskPriorityError" required>
+                <option value="">Select a priority</option>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+              </select>
+              <p class="field__error" id="taskPriorityError" hidden></p>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label class="field__label" for="taskDueDate">Due Date</label>
+              <input class="input" id="taskDueDate" name="dueDate" type="date" aria-describedby="taskDueDateError">
+              <p class="field__error" id="taskDueDateError" hidden></p>
+            </div>
+            <div class="field">
+              <label class="field__label" for="taskDueTime">Due Time</label>
+              <input class="input" id="taskDueTime" name="dueTime" type="time" aria-describedby="taskDueTimeError">
+              <p class="field__error" id="taskDueTimeError" hidden></p>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field__label" for="taskStatus">Status</label>
+            <select class="select" id="taskStatus" name="status" aria-describedby="taskStatusError">
+              <option value="Todo" selected>Todo</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+            <p class="field__error" id="taskStatusError" hidden></p>
+          </div>
+        </div>
+        <footer class="modal__footer">
+          <button class="btn btn-secondary" type="button" data-close-modal>Cancel</button>
+          <button class="btn btn-primary" id="taskSubmit" type="submit">Create Task</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirmation modal (delete task, delete category, reset data) -->
+  <div class="modal" id="confirmModal" hidden>
+    <div class="modal__panel modal__panel--small" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmMessage">
+      <header class="modal__header">
+        <h2 class="modal__title" id="confirmTitle">Confirm</h2>
+        <button class="icon-btn" type="button" data-close-modal aria-label="Close dialog" data-icon="x"></button>
+      </header>
+      <div class="modal__body">
+        <p id="confirmMessage"></p>
+        <p class="confirm__detail" id="confirmDetail" hidden></p>
+      </div>
+      <footer class="modal__footer">
+        <button class="btn btn-secondary" type="button" data-close-modal data-autofocus>Cancel</button>
+        <button class="btn btn-danger" id="confirmAccept" type="button">Delete</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/tasks.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

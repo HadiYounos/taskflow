@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TaskFlow | Organize Your Work. Achieve More.</title>
+  <meta name="description" content="TaskFlow helps you organize your tasks, track your progress, and stay focused on what matters most.">
+  <meta name="theme-color" content="#0f766e">
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+  <script>
+    /* Apply the saved theme before first paint to avoid a flash. */
+    (function () {
+      try {
+        var stored = JSON.parse(localStorage.getItem('taskflow.theme'));
+        var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.dataset.theme = stored === 'light' || stored === 'dark' ? stored : dark ? 'dark' : 'light';
+      } catch (error) {
+        document.documentElement.dataset.theme = 'light';
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body data-page="landing">
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="container nav">
+      <a class="logo" href="#home" aria-label="TaskFlow home">
+        <svg class="logo__mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+          <rect width="32" height="32" rx="9"></rect>
+          <path d="M9 16.5l4.5 4.5L23 11" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        <span class="logo__text">TaskFlow</span>
+      </a>
+
+      <div class="nav__menu" id="navMenu">
+        <nav aria-label="Primary">
+          <ul class="nav__links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#about">About</a></li>
+          </ul>
+        </nav>
+        <div class="nav__actions">
+          <a class="btn btn-ghost" href="dashboard.html">Login</a>
+          <a class="btn btn-primary" href="dashboard.html">Get Started</a>
+        </div>
+      </div>
+
+      <div class="nav__tools">
+        <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch to dark mode">
+          <span class="theme-icon theme-icon--moon" data-icon="moon"></span>
+          <span class="theme-icon theme-icon--sun" data-icon="sun"></span>
+        </button>
+        <button class="icon-btn nav__toggle" id="navToggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu">
+          <span class="nav-toggle__menu" data-icon="menu"></span>
+          <span class="nav-toggle__close" data-icon="x"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="hero" id="home" aria-labelledby="hero-title">
+      <div class="container hero__grid">
+        <div class="hero__copy">
+          <h1 class="hero__title" id="hero-title">Organize Your Work.<br>Achieve More.</h1>
+          <p class="hero__lead">TaskFlow helps you organize your tasks, track your progress, and stay focused on what matters most.</p>
+          <div class="hero__actions">
+            <a class="btn btn-primary btn-lg" href="dashboard.html">Get Started</a>
+            <a class="btn btn-secondary btn-lg" href="#features">Explore Features</a>
+          </div>
+          <p class="hero__note">Free to try. Your tasks stay in your browser.</p>
+        </div>
+
+        <div class="hero__visual">
+          <div class="preview" data-preview>
+            <div class="preview__window">
+              <div class="preview__top">
+                <p class="preview__title">Today’s plan</p>
+                <span class="badge badge--status-in-progress">Try it: tick a task</span>
+              </div>
+              <div class="preview__progress">
+                <div class="preview__progress-head">
+                  <span>Today’s Progress</span>
+                  <strong data-preview-percent>33%</strong>
+                </div>
+                <div class="preview__bar" role="progressbar" aria-label="Preview progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="33">
+                  <div class="preview__fill" data-preview-fill></div>
+                </div>
+                <p class="preview__caption" data-preview-caption>1 of 3 done</p>
+              </div>
+              <ul class="preview__tasks">
+                <li>
+                  <label class="preview-task">
+                    <input type="checkbox">
+                    <span class="preview-task__box"><span data-icon="check"></span></span>
+                    <span class="preview-task__text">
+                      <span class="preview-task__title">Finish Portfolio Website</span>
+                      <span class="preview-task__meta">
+                        <span class="badge badge--high">High</span>
+                        <span class="chip-tag" style="--cat-color:#0F766E"><span class="dot"></span>Development</span>
+                      </span>
+                    </span>
+                  </label>
+                </li>
+                <li>
+                  <label class="preview-task">
+                    <input type="checkbox" checked>
+                    <span class="preview-task__box"><span data-icon="check"></span></span>
+                    <span class="preview-task__text">
+                      <span class="preview-task__title">Design Landing Page</span>
+                      <span class="preview-task__meta">
+                        <span class="badge badge--medium">Medium</span>
+                        <span class="chip-tag" style="--cat-color:#BE185D"><span class="dot"></span>Design</span>
+                      </span>
+                    </span>
+                  </label>
+                </li>
+                <li>
+                  <label class="preview-task">
+                    <input type="checkbox">
+                    <span class="preview-task__box"><span data-icon="check"></span></span>
+                    <span class="preview-task__text">
+                      <span class="preview-task__title">Study JavaScript</span>
+                      <span class="preview-task__meta">
+                        <span class="badge badge--low">Low</span>
+                        <span class="chip-tag" style="--cat-color:#B45309"><span class="dot"></span>Study</span>
+                      </span>
+                    </span>
+                  </label>
+                </li>
+              </ul>
+            </div>
+            <div class="preview__float" aria-hidden="true">
+              <span data-icon="check-circle"></span>
+              <span>Task completed successfully.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="features" aria-labelledby="features-title">
+      <div class="container">
+        <div class="section__head">
+          <h2 class="section__title" id="features-title">Everything you need to stay on top of your work</h2>
+          <p class="section__lead">Six focused tools in one calm workspace.</p>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature-card feature-card--wide">
+            <span class="feature-card__icon" data-icon="check-circle"></span>
+            <h3>Smart Task Management</h3>
+            <p>Create, organize and manage tasks with ease. Edit anything in one place and mark work done with a single click.</p>
+            <ul class="feature-card__demo" aria-hidden="true">
+              <li class="demo-row"><span class="demo-check demo-check--done"></span><span>Review pull requests</span></li>
+              <li class="demo-row"><span class="demo-check"></span><span>Write project documentation</span></li>
+            </ul>
+          </article>
+
+          <article class="feature-card">
+            <span class="feature-card__icon" data-icon="flag"></span>
+            <h3>Priority Management</h3>
+            <p>Mark every task as Low, Medium or High so the important work stands out.</p>
+            <div class="feature-card__demo feature-card__demo--row" aria-hidden="true">
+              <span class="badge badge--high">High</span>
+              <span class="badge badge--medium">Medium</span>
+              <span class="badge badge--low">Low</span>
+            </div>
+          </article>
+
+          <article class="feature-card">
+            <span class="feature-card__icon" data-icon="trending-up"></span>
+            <h3>Progress Tracking</h3>
+            <p>See how much of your day is done at a glance.</p>
+            <div class="feature-card__demo" aria-hidden="true">
+              <div class="mini-progress"><span class="mini-progress__fill" style="width:72%"></span></div>
+            </div>
+          </article>
+
+          <article class="feature-card feature-card--wide">
+            <span class="feature-card__icon" data-icon="clock"></span>
+            <h3>Deadlines</h3>
+            <p>Set a due date and time for any task, and spot overdue work immediately instead of discovering it too late.</p>
+            <div class="feature-card__demo feature-card__demo--row" aria-hidden="true">
+              <span class="due"><span data-icon="clock"></span><span>Today, 6:00 PM</span></span>
+              <span class="due due--overdue"><span data-icon="alert"></span><span>Overdue: Yesterday</span></span>
+            </div>
+          </article>
+
+          <article class="feature-card feature-card--wide">
+            <span class="feature-card__icon" data-icon="tag"></span>
+            <h3>Categories</h3>
+            <p>Group tasks by project or area. Every category gets its own color, so your list is easy to scan.</p>
+            <div class="feature-card__demo feature-card__demo--row" aria-hidden="true">
+              <span class="chip-tag" style="--cat-color:#2563EB"><span class="dot"></span>Work</span>
+              <span class="chip-tag" style="--cat-color:#7C3AED"><span class="dot"></span>Personal</span>
+              <span class="chip-tag" style="--cat-color:#0F766E"><span class="dot"></span>Development</span>
+              <span class="chip-tag" style="--cat-color:#BE185D"><span class="dot"></span>Design</span>
+            </div>
+          </article>
+
+          <article class="feature-card">
+            <span class="feature-card__icon" data-icon="hard-drive"></span>
+            <h3>Local Storage</h3>
+            <p>Your data is saved in your browser, so nothing disappears when you reload.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--muted" id="how-it-works" aria-labelledby="how-title">
+      <div class="container">
+        <div class="section__head">
+          <h2 class="section__title" id="how-title">How it works</h2>
+          <p class="section__lead">From idea to done in three steps.</p>
+        </div>
+        <ol class="steps">
+          <li class="step">
+            <span class="step__number" aria-hidden="true">01</span>
+            <h3>Create</h3>
+            <p>Create a new task in seconds. A title is all you need to start.</p>
+          </li>
+          <li class="step">
+            <span class="step__number" aria-hidden="true">02</span>
+            <h3>Organize</h3>
+            <p>Set the priority, category and deadline so you always know what comes next.</p>
+          </li>
+          <li class="step">
+            <span class="step__number" aria-hidden="true">03</span>
+            <h3>Complete</h3>
+            <p>Finish the task and watch your progress update.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section" id="about" aria-labelledby="about-title">
+      <div class="container about">
+        <div class="about__copy">
+          <h2 class="section__title" id="about-title">Built from scratch, built to be used</h2>
+          <p>TaskFlow is a front-end portfolio project that behaves like a real product. It is written with plain HTML, CSS and JavaScript, organized into small modules, and designed to be fast, accessible and easy to read.</p>
+          <a class="btn btn-primary" href="dashboard.html">Open the dashboard</a>
+        </div>
+        <ul class="about__facts">
+          <li><span class="about__icon" data-icon="code"></span><div><h3>No frameworks</h3><p>Vanilla HTML5, CSS3 and JavaScript ES6+.</p></div></li>
+          <li><span class="about__icon" data-icon="shield"></span><div><h3>Accessible</h3><p>Semantic markup, keyboard support and visible focus.</p></div></li>
+          <li><span class="about__icon" data-icon="zap"></span><div><h3>Fast</h3><p>Event delegation and targeted rendering keep it light.</p></div></li>
+          <li><span class="about__icon" data-icon="hard-drive"></span><div><h3>Private</h3><p>Your tasks never leave your browser.</p></div></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="cta" aria-labelledby="cta-title">
+      <div class="container cta__inner">
+        <h2 id="cta-title">Ready to plan your day?</h2>
+        <p>Open the dashboard and add your first task. Demo tasks are included so you can explore right away.</p>
+        <a class="btn btn-lg cta__button" href="dashboard.html">Get Started</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer__inner">
+      <a class="logo" href="#home" aria-label="TaskFlow home">
+        <svg class="logo__mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+          <rect width="32" height="32" rx="9"></rect>
+          <path d="M9 16.5l4.5 4.5L23 11" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        <span class="logo__text">TaskFlow</span>
+      </a>
+      <p class="footer__note">Built with HTML, CSS and vanilla JavaScript. &copy; <span data-year>2026</span> TaskFlow.</p>
+    </div>
+  </footer>
+
+  <script src="js/utils.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
